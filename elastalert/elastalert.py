@@ -32,6 +32,7 @@ from .config import load_conf
 from .enhancements import DropMatchException
 from .ruletypes import FlatlineRule
 from .util import add_raw_postfix
+from .util import remove_raw_postfix
 from .util import cronite_datetime_to_timestamp
 from .util import dt_to_ts
 from .util import dt_to_unix
@@ -1997,7 +1998,7 @@ class ElastAlerter(object):
                 top_events_count = dict(counts[:number])
 
             # Save a dict with the top 5 events by key
-            all_counts[key] = top_events_count
+            all_counts[remove_raw_postfix(key, rule['five'])] = top_events_count
         return {'top_events': all_counts}
 
     def next_alert_time(self, rule, name, timestamp):

@@ -68,9 +68,10 @@ class BasicMatchString(object):
     def _add_custom_alert_text(self):
         missing = self.rule.get('alert_missing_value', '<MISSING VALUE>')
         alert_text = str(self.rule.get('alert_text', ''))
-        if 'alert_text_args' in self.rule:
-            alert_text = Template(alert_text).render(**self.match)
-        elif 'alert_text_kw' in self.rule:
+
+        alert_text = Template(alert_text).render(**self.match)
+
+        if 'alert_text_kw' in self.rule:
             kw = {}
             for name, kw_name in list(self.rule.get('alert_text_kw').items()):
                 val = lookup_es_key(self.match, name)
@@ -1141,7 +1142,7 @@ class SlackAlerter(Alerter):
         alert_fields = []
         for arg in self.slack_alert_fields:
             arg = copy.copy(arg)
-            arg['value'] = lookup_es_key(matches[0], arg['value'])
+            arg['value'] = Template(arg['value']).render(matches[0])
             alert_fields.append(arg)
         return alert_fields
 
