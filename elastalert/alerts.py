@@ -18,6 +18,7 @@ from smtplib import SMTP_SSL
 from smtplib import SMTPAuthenticationError
 from smtplib import SMTPException
 from socket import error
+# from jinja2 import Template
 
 import boto3
 import requests
@@ -256,11 +257,15 @@ class Alerter(object):
     def create_alert_body(self, matches):
         body = self.get_aggregation_summary_text(matches)
         if self.rule.get('alert_text_type') != 'aggregation_summary_only':
-            for match in matches:
-                body += str(BasicMatchString(self.rule, match))
-                # Separate text of aggregated alerts with dashes
-                if len(matches) > 1:
-                    body += '\n----------------------------------------\n'
+
+            if self.rule.get('alert_text_type') == 'alert_text_only' and 'aggregation' in self.rule:
+                body += str(BasicMatchString(self.rule, matches[0]))
+            else:
+                for match in matches:
+                    body += str(BasicMatchString(self.rule, match))
+                    # Separate text of aggregated alerts with dashes
+                    if len(matches) > 1:
+                        body += '\n----------------------------------------\n'
         return body
 
     def get_aggregation_summary_text__maximum_width(self):
