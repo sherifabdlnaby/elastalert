@@ -1997,9 +1997,8 @@ class ElastAlerter(object):
                 top_events_count = dict(counts[:number])
 
             # Save a dict with the top 5 events by key
-            all_counts['top_events_%s' % (key)] = top_events_count
-
-        return all_counts
+            all_counts[key] = top_events_count
+        return {'top_events': all_counts}
 
     def next_alert_time(self, rule, name, timestamp):
         """ Calculate an 'until' time and exponent based on how much past the last 'until' we are. """
