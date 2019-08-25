@@ -18,7 +18,7 @@ from smtplib import SMTP_SSL
 from smtplib import SMTPAuthenticationError
 from smtplib import SMTPException
 from socket import error
-# from jinja2 import Template
+from jinja2 import Template
 
 import boto3
 import requests
@@ -69,20 +69,7 @@ class BasicMatchString(object):
         missing = self.rule.get('alert_missing_value', '<MISSING VALUE>')
         alert_text = str(self.rule.get('alert_text', ''))
         if 'alert_text_args' in self.rule:
-            alert_text_args = self.rule.get('alert_text_args')
-            alert_text_values = [lookup_es_key(self.match, arg) for arg in alert_text_args]
-
-            # Support referencing other top-level rule properties
-            # This technically may not work if there is a top-level rule property with the same name
-            # as an es result key, since it would have been matched in the lookup_es_key call above
-            for i, text_value in enumerate(alert_text_values):
-                if text_value is None:
-                    alert_value = self.rule.get(alert_text_args[i])
-                    if alert_value:
-                        alert_text_values[i] = alert_value
-
-            alert_text_values = [missing if val is None else val for val in alert_text_values]
-            alert_text = alert_text.format(*alert_text_values)
+            alert_text = Template(alert_text).render(**self.match)
         elif 'alert_text_kw' in self.rule:
             kw = {}
             for name, kw_name in list(self.rule.get('alert_text_kw').items()):
