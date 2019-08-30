@@ -275,6 +275,7 @@ class RulesLoader(object):
         rule.setdefault('_source_enabled', True)
         rule.setdefault('use_local_time', True)
         rule.setdefault('description', "")
+        rule.setdefault('jinja_root_name', "_data")
         rule.setdefault('top_count_absolute_timeframe', False)
         rule.setdefault('jinja_root_name', "_data")
 
