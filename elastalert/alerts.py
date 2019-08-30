@@ -23,6 +23,7 @@ import boto3
 import requests
 import stomp
 from exotel import Exotel
+from jinja2 import Template
 from jira.client import JIRA
 from jira.exceptions import JIRAError
 from requests.auth import HTTPProxyAuth
@@ -1151,7 +1152,15 @@ class SlackAlerter(Alerter):
         alert_fields = []
         for arg in self.slack_alert_fields:
             arg = copy.copy(arg)
-            arg['value'] = lookup_es_key(matches[0], arg['value'])
+
+            # Support field direct substitution (for backward compatibility)
+            value = lookup_es_key(matches[0], arg['value'])
+            if value is not None:
+                arg['value'] = value
+            else:
+                # Render using Jinja2 Template
+                arg['value'] = Template(arg['value']).render(matches[0])
+
             alert_fields.append(arg)
         return alert_fields
 
