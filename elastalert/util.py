@@ -302,6 +302,16 @@ def add_raw_postfix(field, is_five_or_above):
     return field
 
 
+def remove_raw_postfix(field, is_five_or_above):
+    if is_five_or_above:
+        end = '.keyword'
+    else:
+        end = '.raw'
+    if field.endswith(end):
+        field = field[:len(field) - len(end)]
+    return field
+
+
 def replace_dots_in_field_names(document):
     """ This method destructively modifies document by replacing any dots in
     field names with an underscore. """
