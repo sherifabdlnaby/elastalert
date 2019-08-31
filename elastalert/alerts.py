@@ -1162,7 +1162,7 @@ class SlackAlerter(Alerter):
                 arg['value'] = value
             else:
                 # Render using Jinja2 Template
-                arg['value'] = Template(arg['value']).render(matches[0])
+                arg['value'] = Template(arg['value']).render(matches[0], **{self.rule['jinja_root_name']: matches[0]})
 
             alert_fields.append(arg)
         return alert_fields
