@@ -16,6 +16,31 @@ on inconsistencies in our data. Out of this need, ElastAlert was created.
 
 If you have data being written into Elasticsearch in near real time and want to be alerted when that data matches certain patterns, ElastAlert is the tool for you. If you can see it in Kibana, ElastAlert can alert on it.
 
+## This Fork
+
+This fork has Jinja2 Options
+
+You can use the field ``alert_text`` to add custom text to an alert. By setting ``alert_text_type: alert_text_only`` Or **the new** ``alert_text_type: alert_text_jinja``, it will be the entirety of the alert.
+
+With ``alert_text_type: alert_text_jinja`` by using [Jinja2](https://pypi.org/project/Jinja2/) Template.
+
+```
+alert_text_type: alert_text_jinja
+
+alert_text: |
+  Alert triggered! *({{num_hits}} Matches!)*
+  Something happened with {{username}} ({{email}})
+  {{description|truncate}}
+
+```
+
+> Top fields are accessible via `{{field_name}}` or `{{_data['field_name']}}`, `_data` is useful when accessing *fields with dots in their keys*, as Jinja treat dot as a nested field.
+> If `_data` conflicts with your top level data, use  ``jinja_root_name`` to change its name.
+
+With Jinja2 you can add conditional text, for loops, and make your alerts much more informative.
+For example, with Slack, depending on how many matches, we add a conditional `@channel` notification. as well as for-looping over important data and printing them in a clean concise way.
+
+
 ## Overview
 
 We designed ElastAlert to be reliable, highly modular, and easy to set up and configure.
@@ -338,6 +363,3 @@ ElastAlert is licensed under the Apache License, Version 2.0: http://www.apache.
 ### Read the documentation at [Read the Docs](http://elastalert.readthedocs.org).
 
 ### Questions? Drop by #elastalert on Freenode IRC.
-
-
-[Jinja2]: https://pypi.org/project/Jinja2/Jinja2
