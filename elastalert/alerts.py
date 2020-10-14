@@ -100,7 +100,8 @@ class BasicMatchString(object):
             #  Top fields are accessible via `{{field_name}}` or `{{jinja_root_name['field_name']}}`
             #  `jinja_root_name` dict is useful when accessing *fields with dots in their keys*,
             #  as Jinja treat dot as a nested field.
-            alert_text = self.rule.get("jinja_template").render(**self.match, **{self.rule['jinja_root_name']: self.match})
+            alert_text = self.rule.get("jinja_template").render(**self.match,
+                                                                **{self.rule['jinja_root_name']: self.match})
 
         self.text += alert_text
 
@@ -143,7 +144,8 @@ class BasicMatchString(object):
             return json.dumps(blob, cls=DateTimeEncoder, sort_keys=True, indent=4, ensure_ascii=False)
         except UnicodeDecodeError:
             # This blob contains non-unicode, so lets pretend it's Latin-1 to show something
-            return json.dumps(blob, cls=DateTimeEncoder, sort_keys=True, indent=4, encoding='Latin-1', ensure_ascii=False)
+            return json.dumps(blob, cls=DateTimeEncoder, sort_keys=True, indent=4, encoding='Latin-1',
+                              ensure_ascii=False)
 
     def __str__(self):
         self.text = ''
@@ -152,7 +154,8 @@ class BasicMatchString(object):
 
         self._add_custom_alert_text()
         self._ensure_new_line()
-        if self.rule.get('alert_text_type') != 'alert_text_only' and self.rule.get('alert_text_type') != 'alert_text_jinja':
+        if self.rule.get('alert_text_type') != 'alert_text_only' and self.rule.get(
+            'alert_text_type') != 'alert_text_jinja':
             self._add_rule_text()
             self._ensure_new_line()
             if self.rule.get('top_count_keys'):
@@ -343,7 +346,8 @@ class StompAlerter(Alerter):
 
             if resmatch is not None:
                 elastalert_logger.info(
-                    'Alert for %s, %s at %s:' % (self.rule['name'], resmatch, lookup_es_key(match, self.rule['timestamp_field'])))
+                    'Alert for %s, %s at %s:' % (
+                    self.rule['name'], resmatch, lookup_es_key(match, self.rule['timestamp_field'])))
                 alerts.append(
                     'Alert for %s, %s at %s:' % (self.rule['name'], resmatch, lookup_es_key(
                         match, self.rule['timestamp_field']))
@@ -400,9 +404,11 @@ class DebugAlerter(Alerter):
         for match in matches:
             if qk in match:
                 elastalert_logger.info(
-                    'Alert for %s, %s at %s:' % (self.rule['name'], match[qk], lookup_es_key(match, self.rule['timestamp_field'])))
+                    'Alert for %s, %s at %s:' % (
+                    self.rule['name'], match[qk], lookup_es_key(match, self.rule['timestamp_field'])))
             else:
-                elastalert_logger.info('Alert for %s at %s:' % (self.rule['name'], lookup_es_key(match, self.rule['timestamp_field'])))
+                elastalert_logger.info(
+                    'Alert for %s at %s:' % (self.rule['name'], lookup_es_key(match, self.rule['timestamp_field'])))
             elastalert_logger.info(str(BasicMatchString(self.rule, match)))
 
     def get_info(self):
@@ -477,7 +483,8 @@ class EmailAlerter(Alerter):
         try:
             if self.smtp_ssl:
                 if self.smtp_port:
-                    self.smtp = SMTP_SSL(self.smtp_host, self.smtp_port, keyfile=self.smtp_key_file, certfile=self.smtp_cert_file)
+                    self.smtp = SMTP_SSL(self.smtp_host, self.smtp_port, keyfile=self.smtp_key_file,
+                                         certfile=self.smtp_cert_file)
                 else:
                     self.smtp = SMTP_SSL(self.smtp_host, keyfile=self.smtp_key_file, certfile=self.smtp_cert_file)
             else:
@@ -616,7 +623,8 @@ class JiraAlerter(Alerter):
             if self.priority is not None and self.client is not None:
                 self.jira_args['priority'] = {'id': self.priority_ids[self.priority]}
         except KeyError:
-            logging.error("Priority %s not found. Valid priorities are %s" % (self.priority, list(self.priority_ids.keys())))
+            logging.error(
+                "Priority %s not found. Valid priorities are %s" % (self.priority, list(self.priority_ids.keys())))
 
     def reset_jira_args(self):
         self.jira_args = {'project': {'key': self.project},
@@ -659,7 +667,8 @@ class JiraAlerter(Alerter):
         # If the schema information is not available, raise an exception since we don't know how to set it
         # Note this is only the case for two built-in types, id: issuekey and id: thumbnail
         if not ('schema' in field or 'type' in field['schema']):
-            raise Exception("Could not determine schema information for the jira field '{0}'".format(normalized_jira_field))
+            raise Exception(
+                "Could not determine schema information for the jira field '{0}'".format(normalized_jira_field))
         arg_type = field['schema']['type']
 
         # Handle arrays of simple types like strings or numbers
@@ -673,7 +682,8 @@ class JiraAlerter(Alerter):
             if array_items in ['string', 'date', 'datetime']:
                 # Special case for multi-select custom types (the JIRA metadata says that these are strings, but
                 # in reality, they are required to be provided as an object.
-                if 'custom' in field['schema'] and field['schema']['custom'] in self.custom_string_types_with_special_handling:
+                if 'custom' in field['schema'] and field['schema'][
+                    'custom'] in self.custom_string_types_with_special_handling:
                     self.jira_args[arg_name] = [{'value': v} for v in value]
                 else:
                     self.jira_args[arg_name] = value
@@ -693,7 +703,8 @@ class JiraAlerter(Alerter):
             if arg_type in ['string', 'date', 'datetime']:
                 # Special case for custom types (the JIRA metadata says that these are strings, but
                 # in reality, they are required to be provided as an object.
-                if 'custom' in field['schema'] and field['schema']['custom'] in self.custom_string_types_with_special_handling:
+                if 'custom' in field['schema'] and field['schema'][
+                    'custom'] in self.custom_string_types_with_special_handling:
                     self.jira_args[arg_name] = {'value': value}
                 else:
                     self.jira_args[arg_name] = value
@@ -838,7 +849,7 @@ class JiraAlerter(Alerter):
                         # Re-raise the exception, preserve the stack-trace, and give some
                         # context as to which watcher failed to be added
                         raise Exception(
-                            "Exception encountered when trying to add '{0}' as a watcher. Does the user exist?\n{1}" .format(
+                            "Exception encountered when trying to add '{0}' as a watcher. Does the user exist?\n{1}".format(
                                 watcher,
                                 ex
                             )).with_traceback(sys.exc_info()[2])
@@ -1099,7 +1110,8 @@ class MsTeamsAlerter(Alerter):
 
         for url in self.ms_teams_webhook_url:
             try:
-                response = requests.post(url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies)
+                response = requests.post(url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers,
+                                         proxies=proxies)
                 response.raise_for_status()
             except RequestException as e:
                 raise EAException("Error posting to ms teams: %s" % e)
@@ -1138,6 +1150,7 @@ class SlackAlerter(Alerter):
         self.slack_attach_kibana_discover_url = self.rule.get('slack_attach_kibana_discover_url', False)
         self.slack_kibana_discover_color = self.rule.get('slack_kibana_discover_color', '#ec4b98')
         self.slack_kibana_discover_title = self.rule.get('slack_kibana_discover_title', 'Discover in Kibana')
+        self.slack_notification_type = self.rule.get('slack_notification_type', 'plain_text')
         self.footer = self.rule.get('slack_footer', '')
         self.footer_icon = self.rule.get('slack_footer_icon', '')
 
@@ -1176,26 +1189,40 @@ class SlackAlerter(Alerter):
         body = self.create_alert_body(matches)
 
         body = self.format_body(body)
+
+        alert_text = str(self.create_title(matches)) + '\n' + str(body)
         # post to slack
         headers = {'content-type': 'application/json'}
         # set https proxy, if it was provided
         proxies = {'https': self.slack_proxy} if self.slack_proxy else None
-        payload = {
-            'username': self.slack_username_override,
-            'parse': self.slack_parse_override,
-            'text': self.slack_text_string,
-            'attachments': [
-                {
-                    'color': self.slack_msg_color,
-                    'title': self.create_title(matches),
-                    'text': body,
-                    'mrkdwn_in': ['text', 'pretext'],
-                    'fields': [],
-                    'footer': self.footer,
-                    'footer_icon': self.footer_icon
-                }
-            ]
-        }
+
+        payload = {}
+
+        # slack notification: text
+        if self.slack_notification_type == 'plain_text':
+            payload = {
+                'username': self.slack_username_override,
+                'parse': self.slack_parse_override,
+                'text': alert_text,
+                'mrkdwn': ["text"],
+            }
+        elif self.slack_notification_type == 'attachment':  # attachment
+            payload = {
+                'username': self.slack_username_override,
+                'parse': self.slack_parse_override,
+                'text': self.slack_text_string,
+                'attachments': [
+                    {
+                        'color': self.slack_msg_color,
+                        'title': self.create_title(matches),
+                        'text': body,
+                        'mrkdwn_in': ['text', 'pretext'],
+                        'fields': [],
+                        'footer': self.footer,
+                        'footer_icon': self.footer_icon
+                    }
+                ]
+            }
 
         # if we have defined fields, populate noteable fields for the alert
         if self.slack_alert_fields != '':
@@ -1293,7 +1320,7 @@ class MattermostAlerter(Alerter):
                     field['value'] = field['value'].format(*args_values)
                 else:
                     field['value'] = "\n".join(str(arg) for arg in args_values)
-                del(field['args'])
+                del (field['args'])
             alert_fields.append(field)
         return alert_fields
 
@@ -1512,7 +1539,8 @@ class PagerTreeAlerter(Alerter):
         }
 
         try:
-            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies)
+            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers,
+                                     proxies=proxies)
             response.raise_for_status()
         except RequestException as e:
             raise EAException("Error posting to PagerTree: %s" % e)
@@ -1610,7 +1638,8 @@ class VictorOpsAlerter(Alerter):
             payload["entity_id"] = self.victorops_entity_id
 
         try:
-            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies)
+            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers,
+                                     proxies=proxies)
             response.raise_for_status()
         except RequestException as e:
             raise EAException("Error posting to VictorOps: %s" % e)
@@ -1649,7 +1678,8 @@ class TelegramAlerter(Alerter):
         headers = {'content-type': 'application/json'}
         # set https proxy, if it was provided
         proxies = {'https': self.telegram_proxy} if self.telegram_proxy else None
-        auth = HTTPProxyAuth(self.telegram_proxy_login, self.telegram_proxy_password) if self.telegram_proxy_login else None
+        auth = HTTPProxyAuth(self.telegram_proxy_login,
+                             self.telegram_proxy_password) if self.telegram_proxy_login else None
         payload = {
             'chat_id': self.telegram_room_id,
             'text': body,
@@ -1658,11 +1688,13 @@ class TelegramAlerter(Alerter):
         }
 
         try:
-            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies, auth=auth)
+            response = requests.post(self.url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers,
+                                     proxies=proxies, auth=auth)
             warnings.resetwarnings()
             response.raise_for_status()
         except RequestException as e:
-            raise EAException("Error posting to Telegram: %s. Details: %s" % (e, "" if e.response is None else e.response.text))
+            raise EAException(
+                "Error posting to Telegram: %s. Details: %s" % (e, "" if e.response is None else e.response.text))
 
         elastalert_logger.info(
             "Alert sent to Telegram room %s" % self.telegram_room_id)
@@ -1784,7 +1816,8 @@ class GitterAlerter(Alerter):
         }
 
         try:
-            response = requests.post(self.gitter_webhook_url, json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies)
+            response = requests.post(self.gitter_webhook_url, json.dumps(payload, cls=DateTimeEncoder), headers=headers,
+                                     proxies=proxies)
             response.raise_for_status()
         except RequestException as e:
             raise EAException("Error posting to Gitter: %s" % e)
@@ -1926,8 +1959,10 @@ class AlertaAlerter(Alerter):
         """
 
         # Using default text and event title if not defined in rule
-        alerta_text = self.rule['type'].get_match_str([match]) if self.text == '' else resolve_string(self.text, match, self.missing_text)
-        alerta_event = self.create_default_title([match]) if self.event == '' else resolve_string(self.event, match, self.missing_text)
+        alerta_text = self.rule['type'].get_match_str([match]) if self.text == '' else resolve_string(self.text, match,
+                                                                                                      self.missing_text)
+        alerta_event = self.create_default_title([match]) if self.event == '' else resolve_string(self.event, match,
+                                                                                                  self.missing_text)
 
         match_timestamp = lookup_es_key(match, self.rule.get('timestamp_field', '@timestamp'))
         if match_timestamp is None:
@@ -1953,7 +1988,8 @@ class AlertaAlerter(Alerter):
             'tags': [resolve_string(a_tag, match, self.missing_text) for a_tag in self.tags],
             'correlate': [resolve_string(an_event, match, self.missing_text) for an_event in self.correlate],
             'attributes': dict(list(zip(self.attributes_keys,
-                                        [resolve_string(a_value, match, self.missing_text) for a_value in self.attributes_values]))),
+                                        [resolve_string(a_value, match, self.missing_text) for a_value in
+                                         self.attributes_values]))),
             'rawData': self.create_alert_body([match]),
         }
 
@@ -2158,7 +2194,8 @@ class HiveAlerter(Alerter):
                         data_keys = match_data_keys + rule_data_keys
                         context_keys = list(context['match'].keys()) + list(context['rule'].keys())
                         if all([True if k in context_keys else False for k in data_keys]):
-                            artifacts.append(AlertArtifact(dataType=observable_type, data=match_data_key.format(**context)))
+                            artifacts.append(
+                                AlertArtifact(dataType=observable_type, data=match_data_key.format(**context)))
                     except KeyError:
                         raise KeyError('\nformat string\n{}\nmatch data\n{}'.format(match_data_key, context))
 
